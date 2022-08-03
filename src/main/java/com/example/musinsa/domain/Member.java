@@ -1,5 +1,6 @@
-package com.example.musinsa.data;
+package com.example.musinsa.domain;
 
+import com.example.musinsa.exception.NotEnoughPointException;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -35,15 +36,31 @@ public class Member {
     @Column(nullable = false, length = 10)
     private int point; // 포인트
 
-    @Column(name="balancingpoint", length=10)
-    private int balancingPoint; // 잔액
-
     @Column(name="totalpoint", length = 10)
     private int totalPoint; // 총액
 
     // 관리자가 포인트 금액 수정할 수 있게 설정
     public void changePoint(int point) {
         this.point = point;
+    }
+
+    //== 비즈니스 로직==//
+    /**
+     * point 증가
+     */
+    public void addPoint(int point) {
+        this.totalPoint += point;
+    }
+
+    /**
+     * point 감소
+     */
+    public void removePoint(int point) {
+        int restPoint = this.totalPoint - point;
+        if(restPoint < 0) {
+            throw new NotEnoughPointException("need more point");
+        }
+        this.totalPoint = restPoint;
     }
 
 }
